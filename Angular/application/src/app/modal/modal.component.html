@@ -1,0 +1,28 @@
+<div class="myModal">
+    <div class="myContainer">
+      <div class="modal-content">
+          <button type="button" class="close remove" (click)="closeModal()">&times;</button>
+          <div class="modal-header" style="padding:20px 50px;">
+            <h4>{{operation}} </h4>
+          </div>
+          <div class="modal-body" style="padding:40px 50px;">
+            <form role="form">
+              <div class="form-group">
+                    <img class="card-img-top" style="width:100%" src="{{selectedCustomer.image}}" alt="Card image cap">
+                    <div class="text-center"><button class="btn btn-success">Change</button></div>
+              </div>
+              <div class="form-group">
+                <label for="usrname"> Name</label>
+                <input type="text" class="form-control" id="name" value="{{selectedCustomer.name}}">
+              </div>
+              <div class="form-group">
+                <label for="profession"> Profession</label>
+                <input type="text" class="form-control" id="role" value="{{selectedCustomer.profession}}">
+              </div>
+              <button type="button" class="btn btn-primary btn-block">Save</button>
+              <button type="button" (click)="closeModal()" class="btn btn-danger btn-block">Discard</button>
+            </form>
+          </div>
+        </div>
+      </div>
+  </div>

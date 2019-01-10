@@ -1,0 +1,59 @@
+.myRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.myAdd {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+}
+
+.card {
+    border: 1px solid gray;
+    margin: 10px;
+    width: 20rem;
+}
+
+.card-body {
+    padding: 10px;
+}
+
+.card-title {
+    text-align: center;
+}
+
+.card-text {
+    text-align: center;
+}
+
+.container .close {
+    opacity: 0.7;
+    font-size: 0.8em;
+}
+
+.container .close:hover {
+    opacity: 1.0;
+}
+
+.trash {
+    color: #d9534f;
+}
+
+.pencil {
+    color: #428bca;
+}
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4), 0 6px 20px 0 rgba(0, 0, 0, 0.4);
+    transition-duration: 0.5s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.6), 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+}
+
+.plus {
+    color: #219d7e;
+}
