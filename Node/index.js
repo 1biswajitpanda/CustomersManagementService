@@ -59,12 +59,32 @@ app.post("/api/customer",(req,res)=>{
     })
 })
 
-app.put('api/customer',(req,res)=>{
-    res.end("In Progress")
+app.put('/api/customer',(req,res)=>{
+    let rawDocObject = '';
+    req.on("data",(chunk)=>{
+        rawDocObject += chunk;
+    })
+    req.on("end",()=>{
+        docObject = JSON.parse(rawDocObject);
+        customer.updateOne(docObject,(err,response)=>{
+            if (err) {
+                res.end(`Error : ${err}`)
+            } else {
+                res.send(response)
+            }
+        })
+    })
 })
 
-app.delete('api/customer', (req,res)=>{
-    res.end("In Progress")
+app.delete('/api/customer/:id', (req,res)=>{
+    const id = req.params.id;
+    customer.deleteOne(id,(err,response)=>{
+        if (err) {
+            res.end(`Error : ${err}`)
+        } else {
+            res.send(response)
+        }
+    })
 })
 
 app.get('*',(req,res)=>{

@@ -12,8 +12,9 @@ const routes : Routes = [
   { path: 'orders', component: OrdersComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'modal', component: ModalComponent }
-] 
+  { path: 'modal', component: ModalComponent },
+  { path: '**', redirectTo: '/login' }
+]
 
 
 @NgModule({

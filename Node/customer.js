@@ -16,6 +16,7 @@ customer.findAll = (callback)=>{
             const db = client.db('customer');
             db.collection('customer').find().toArray((err,docs)=>{
                 if (err) {
+                    client.close();
                     callback(err,null)
                 } else {
                     callback(false,docs)
@@ -34,8 +35,10 @@ customer.findOne = (id,callback)=>{
             callback (err,null)
         } else {
             const db = client.db('customer');
-            db.collection('customer').find({'customerId': id}).toArray((err,docs)=>{
+            const Id = Number(id);
+            db.collection('customer').find({'customerId': Id}).toArray((err,docs)=>{
                 if (err) {
+                    client.close();
                     callback(err,null)
                 } else {
                     callback(false,docs)
@@ -52,7 +55,6 @@ customer.indexCollection = (db,callback)=>{
         { "customerId": -1 },
         null,
         (err, results) => {
-            console.log(results);
             callback(err);
         }
     );
@@ -69,6 +71,7 @@ customer.insertOne = (docObject, callback) => {
             // Insert a single document
             db.collection('customer').insertOne(docObject, function(err, result) {
                 if (err) {
+                    client.close();
                     callback(err,null)
                 } else {
                     customer.indexCollection(db,(err)=>{
@@ -78,13 +81,70 @@ customer.insertOne = (docObject, callback) => {
                             client.close()
                         }
                     })
-                    callback(false,result)
                     client.close();
+                    callback(false,result)
                 }
             })
         }
     })
 };
 
+//Update A Customer
+customer.updateOne = (docObject, callback) => {
+    console.log("inside customer updateOne")
+    const client = new MongoClient(url);
+    client.connect((err,client)=>{
+        if (err) {
+            callback (err,null)
+        } else {
+            const db = client.db('customer');
+            //Create the query to identify the customer
+            const determineCustomerQuery = { customerId : docObject.customerId };
+            const newValues = { 
+                $set: 
+                {   customerId : docObject.customerId,
+                    name : docObject.name,
+                    profession : docObject.profession,
+                    image : docObject.image
+                }
+            }
+            //Update the customer
+            db.collection('customer').updateOne(determineCustomerQuery, newValues, function(err, response) {
+                if (err) {
+                    client.close();
+                    callback(err,null)
+                } else {
+                    client.close();
+                    callback(false,response.result);
+                }
+            })
+        }
+    })
+};
+
+//Delete A Customer
+customer.deleteOne = (id, callback) => {
+    const client = new MongoClient(url);
+    client.connect((err,client)=>{
+        if (err) {
+            callback (err,null)
+        } else {
+            const db = client.db('customer');
+            //Create the query to identify the customer
+            const Id = Number(id);
+            const determineCustomerQuery = { customerId : Id };
+            //Delete the customer
+            db.collection('customer').deleteOne(determineCustomerQuery, function(err, response) {
+                if (err) {
+                    client.close();
+                    callback(err,null)
+                } else {
+                    client.close();
+                    callback(false,response.result);
+                }
+            })
+        }
+    })
+};
 
 module.exports = customer;

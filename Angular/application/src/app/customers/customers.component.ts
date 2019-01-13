@@ -1,36 +1,72 @@
+// How to refresh the customers page when the modal is closed?
+//      Though window.location.reload() will work but it is not the correct solution.
+//      Because it will reload the page(not the view), thus violating Single Page Application concept.
+//      So the solution is, when the modal is closed, subscribe to the http getCustomers()
+// Communication from parent to child
+//      modal.component.ts          --> @Input() customer : Customer;
+//      customers.component.html    --> [customer]="selectedCustomer"
+// Communication from child to parent
+//      modal.component.ts          --> @Output() modalActionClose = new EventEmitter<boolean>()
+//                                      closeModal(){
+//                                          this.modalActionClose.emit(this.isActed)
+//                                      }
+//      customers.component.html    --> (modalActionClose)="closeModal($event)
+//                                      /* Whatever data has been passed in this.isActed, the same will be received in $event
+//                                      closeModal (isActed:boolean) { .... }
+
 import { Component, OnInit } from '@angular/core';
 import { Customer } from "../customer";
-import { CustomersGetService } from "../services/customers-get.service";
+import { CustomersDataService } from "../services/customers-data.service";
 
 
 @Component({
-  selector: 'app-customers',
-  templateUrl: './customers.component.html',
-  styleUrls: ['./customers.component.css']
+    selector: 'app-customers',
+    templateUrl: './customers.component.html',
+    styleUrls: ['./customers.component.css']
 })
 export class CustomersComponent implements OnInit {
 
-  isOpen : boolean = false;
-  selectedCustomer : Customer;
-  customers : Customer[];
+    isOpen : boolean = false;
+    isNotLoaded : boolean = true;
+    isAdd : boolean = false;
+    isEdit : boolean = false;
+    isDelete : boolean = false;
+    isZeroCustomers = false;
+    selectedCustomer : Customer;
+    customers : Customer[];
 
-  openModal (customer : Customer) {
-    this.selectedCustomer = customer;
-    this.isOpen = true;
-  }
+    openModal (action: string, customer?: Customer) {
+        this.isZeroCustomers = false;
+        if (action === "add") { this.isAdd = true }
+        if (action === "delete") { this.isDelete = true }
+        if (action === "edit") { this.isEdit = true }
+        this.isOpen = true;
+        this.selectedCustomer = customer;
+    }
 
-  closeModal () {
-    this.isOpen = false;
-  }
+    closeModal (isActed:boolean) {
+        this.isOpen = false;
+        this.isEdit = false;
+        this.isDelete = false;
+        this.isAdd = false;
+        if (isActed){
+            this.isNotLoaded = true;
+            this.customers=[];
+            this.customerDataService.getCustomers().subscribe(customers=>{
+                this.customers=customers;
+                this.isNotLoaded = false;
+            })
+        }
+    }
 
-  constructor(private customerGetService: CustomersGetService) {
+    constructor(private customerDataService: CustomersDataService) {
+    }
 
-  }
-
-  ngOnInit() {
-      this.customerGetService.getCustomers().subscribe(customers=>{
-          this.customers=customers
-          console.log(this.customers)
+    ngOnInit() {
+        this.customerDataService.getCustomers().subscribe(customers=>{
+            this.customers=customers;
+            this.isNotLoaded = false;
+            this.isZeroCustomers = this.customers.length == 0 ? true : false;
         })
-  }
+    }
 }

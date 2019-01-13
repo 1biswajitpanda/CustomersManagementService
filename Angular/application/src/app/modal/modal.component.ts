@@ -1,5 +1,6 @@
 import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { Customer } from "../customer";
+import { CustomersDataService } from '../services/customers-data.service';
 
 @Component({
   selector: 'app-modal',
@@ -8,28 +9,56 @@ import { Customer } from "../customer";
 })
 export class ModalComponent implements OnInit {
 
-  operation : string;
-  selectedCustomer : Customer = {
-    customerId : 0,
-    name : "",
-    profession : "",
-    image : "../../assets/img_avatar.png"
-  }
+    constructor(private customerDataService: CustomersDataService) { }
 
-  constructor() { }
+    @Input() customer : Customer;
+    @Input() isEdit : boolean;
+    @Input() isDelete : boolean;
+    @Input() isAdd : boolean;
+    @Output() modalActionClose = new EventEmitter<boolean>()
 
-  ngOnInit() {
-    this.selectedCustomer = this.customer || this.selectedCustomer;
-    this.operation = this.customer ? "Edit" : "Add";
-  }
+    operation : string;
+    isActed : boolean = false;
+    selectedCustomer : Customer = {
+        customerId : parseInt((Math.random()*1000000/1).toString()),
+        name : "",
+        profession : "",
+        image : "../../assets/img_avatar.png"
+    }
 
+    ngOnInit() {
+        this.selectedCustomer = this.customer || this.selectedCustomer;
+        if (this.isAdd) this.operation = "Add";
+        if (this.isEdit) this.operation = "Edit";
+        if (this.isDelete) this.operation = "Delete";
+    }
 
+    closeModal(){
+        this.modalActionClose.emit(this.isActed)
+    }
 
-  @Input() customer : Customer;
-  @Output() modalActionClose = new EventEmitter<boolean>()
+    saveCustomer() {
+        //TODO: Put the spinner, close the spinner when the response is received from backend
+        this.isActed = true;
+        if (this.isAdd) {
+            this.customerDataService.addCustomer(this.selectedCustomer)
+            .subscribe(returnedItem=>console.log(returnedItem.n))
+            this.isAdd = false;
+            this.isEdit = true;
+            this.operation = "Edit";
+        } else {
+            this.customerDataService.updateCustomer(this.selectedCustomer)
+            .subscribe(returnedItem=>{
+                console.log(returnedItem.n)
+                alert("Saved");
+            })
+        }
+    }
 
-  closeModal(){
-    this.modalActionClose.emit(true)
-  }
-
+    deleteCustomer(id:number) {
+        this.isActed = true;
+        this.customerDataService.deleteCustomer(id)
+        .subscribe(returnedItem=>console.log(returnedItem.n));
+        this.closeModal();
+    }
 }
