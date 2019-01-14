@@ -18,12 +18,15 @@ export class ModalComponent implements OnInit {
     @Output() modalActionClose = new EventEmitter<boolean>()
 
     operation : string;
-    isActed : boolean = false;
+    isActed = false;
+    isSaved = false;
     selectedCustomer : Customer = {
-        customerId : parseInt((Math.random()*1000000/1).toString()),
-        name : "",
-        profession : "",
-        image : "../../assets/img_avatar.png"
+        customerId  : 0,
+        name        : "",
+        profession  : "",
+        address     : "",
+        phone       : "",
+        image       : "../../assets/img_avatar.png"
     }
 
     ngOnInit() {
@@ -38,19 +41,23 @@ export class ModalComponent implements OnInit {
     }
 
     saveCustomer() {
-        //TODO: Put the spinner, close the spinner when the response is received from backend
         this.isActed = true;
         if (this.isAdd) {
             this.customerDataService.addCustomer(this.selectedCustomer)
-            .subscribe(returnedItem=>console.log(returnedItem.n))
-            this.isAdd = false;
-            this.isEdit = true;
-            this.operation = "Edit";
+            .subscribe(returnedItem => {
+                this.selectedCustomer.customerId = returnedItem.customerId
+                if (this.selectedCustomer.customerId > 0) {
+                    this.isAdd = false;
+                    this.isEdit = true;
+                    this.operation = "Edit";
+                    this.isSaved = true;
+                }
+            })
         } else {
             this.customerDataService.updateCustomer(this.selectedCustomer)
-            .subscribe(returnedItem=>{
+            .subscribe(returnedItem => {
                 console.log(returnedItem.n)
-                alert("Saved");
+                this.isSaved = true;
             })
         }
     }
@@ -58,7 +65,11 @@ export class ModalComponent implements OnInit {
     deleteCustomer(id:number) {
         this.isActed = true;
         this.customerDataService.deleteCustomer(id)
-        .subscribe(returnedItem=>console.log(returnedItem.n));
-        this.closeModal();
+        .subscribe(returnedItem => {
+            console.log(returnedItem)
+            if (returnedItem.ok == 1 ) {
+                this.closeModal();
+            }
+        })
     }
 }

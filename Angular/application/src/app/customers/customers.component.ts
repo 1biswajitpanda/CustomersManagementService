@@ -14,6 +14,15 @@
 //                                      /* Whatever data has been passed in this.isActed, the same will be received in $event
 //                                      closeModal (isActed:boolean) { .... }
 
+
+//TODO : Limit the number of records shown in *ngFor
+//TODO : User should be able to see customers page only if he is logged in
+//TODO : Form Validation
+//TODO : Only One user with one perticular username should be allowed
+//TODO : How to get the last key value from the index in mongodb
+//TODO : Password must be encrypted while stored at node
+//TODO : Change the authorization logic in node
+
 import { Component, OnInit } from '@angular/core';
 import { Customer } from "../customer";
 import { CustomersDataService } from "../services/customers-data.service";

@@ -1,3 +1,18 @@
+//  
+//            {
+//                'customerId'  : number,       <--- indexed on customerId
+//                'name'        : string,
+//                'profession'  : string,
+//                'Address'     : string,       
+//                'phone'       : number,
+//                'image'       : string
+//            }
+
+// Below Process has been followed to create the database collection and index.
+//          >use customer
+//          >db.createCollection('customer')
+//          >db.customer.createIndex({customerId:-1},{unique:true})
+
 const MongoClient = require('mongodb').MongoClient;
 
 // Connection URL
@@ -19,8 +34,8 @@ customer.findAll = (callback)=>{
                     client.close();
                     callback(err,null)
                 } else {
-                    callback(false,docs)
                     client.close();
+                    callback(false,docs)
                 }
             })
         }
@@ -41,24 +56,24 @@ customer.findOne = (id,callback)=>{
                     client.close();
                     callback(err,null)
                 } else {
-                    callback(false,docs)
                     client.close();
+                    callback(false,docs)
                 }
             })
         }
     })
 };
 
-//Index Collection 'customer'
-customer.indexCollection = (db,callback)=>{
-    db.collection('customer').createIndex(
-        { "customerId": -1 },
-        null,
-        (err, results) => {
-            callback(err);
-        }
-    );
-}
+// //Index Collection 'customer'
+// customer.createIndex = (db,callback)=>{          /* CREATEINDEX NEEDS TO BE CALLED ONCE WHILE CREATING THE DATABASE */
+//     db.collection('customer').createIndex(       /* HENCE WE SHOULD NOT CALL CREATE INDEX WITH EACH WRITE */
+//         { "customerId": -1 },
+//         { unique : true },
+//         (err, results) => {
+//             callback(err);
+//         }
+//     );
+// }
 
 //Insert A Customer
 customer.insertOne = (docObject, callback) => {
@@ -68,21 +83,27 @@ customer.insertOne = (docObject, callback) => {
             callback (err,null)
         } else {
             const db = client.db('customer');
-            // Insert a single document
-            db.collection('customer').insertOne(docObject, function(err, result) {
+            //find the last customer number inserted
+            db.collection('customer').find({}).sort({ customerId : -1 }).limit(1).toArray((err,docs)=>{
                 if (err) {
-                    client.close();
                     callback(err,null)
                 } else {
-                    customer.indexCollection(db,(err)=>{
-                        if(err) {
-                            console.log("Error while Indexing")
+                    if (docs.length == 0) {
+                        docObject.customerId = parseInt((Math.random()*1000000/1).toString())
+                    } else {
+                        console.log(docs);
+                        docObject.customerId = docs[0].customerId + 1
+                    }
+                    // Insert a single document
+                    db.collection('customer').insertOne(docObject, function(err, response) {
+                        if (err) {
+                            client.close();
+                            callback(err,null)
                         } else {
-                            client.close()
+                            client.close();
+                            callback(false,response.ops[0])
                         }
                     })
-                    client.close();
-                    callback(false,result)
                 }
             })
         }

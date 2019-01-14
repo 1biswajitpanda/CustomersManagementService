@@ -4,7 +4,7 @@ import { CustomersComponent } from "./customers/customers.component";
 import { OrdersComponent } from "./orders/orders.component";
 import { SignupComponent } from "./signup/signup.component";
 import { LoginComponent } from "./login/login.component";
-import { ModalComponent } from "./modal/modal.component";
+import { ModalComponent } from "./customersModal/modal.component";
 
 const routes : Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },

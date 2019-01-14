@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const customer = require("./customer");
+const customer = require("./mongoServices/customer");
+const user = require("./mongoServices/user");
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -18,7 +19,7 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 
 app.listen(9999,()=>{
-    console.log('listening on port 9999 \n.............')
+    console.log(`Time : ${Date.now()}listening on port 9999 \n.............`)
 });
 
 app.get("/api/customer",(req,res)=>{
@@ -51,7 +52,7 @@ app.post("/api/customer",(req,res)=>{
         docObject = JSON.parse(rawDocObject);
         customer.insertOne(docObject,(err,response)=>{
             if (err) {
-                res.end(`Error : ${err}`)
+                res.send(err)
             } else {
                 res.send(response)
             }
@@ -84,6 +85,40 @@ app.delete('/api/customer/:id', (req,res)=>{
         } else {
             res.send(response)
         }
+    })
+})
+
+app.get('/api/user/:username',(req,res)=>{
+    const username = req.params.username;
+    user.findOne(username,(err,docs)=>{
+        if (err) {
+            res.end(`Error : ${err}`)
+        } else {
+            res.json(docs)
+        }
+    })
+})
+
+app.get('/api/verifyuser',(req,res)=>{
+    //TODO : Change the authorization logic
+    console.log('Verified the user successfully')
+    res.json({"status": 1 })
+})
+
+app.post("/api/user",(req,res)=>{
+    let rawDocObject = '';
+    req.on("data",(chunk)=>{
+        rawDocObject += chunk;
+    })
+    req.on("end",()=>{
+        docObject = JSON.parse(rawDocObject);
+        user.insertOne(docObject,(err,response)=>{
+            if (err) {
+                res.send(err)
+            } else {
+                res.send(response)
+            }
+        })
     })
 })
 
