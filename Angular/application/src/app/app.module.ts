@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/auth-interceptor';
 import { FormsModule } from '@angular/forms';
 
 
@@ -27,7 +29,13 @@ import { ModalComponent } from './customersModal/modal.component';
     HttpClientModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+      {
+          provide: HTTP_INTERCEPTORS,
+          useClass: AuthInterceptor,
+          multi: true
+      }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

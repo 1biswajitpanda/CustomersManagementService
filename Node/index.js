@@ -1,127 +1,40 @@
-const express = require("express");
-const app = express();
-const customer = require("./mongoServices/customer");
-const user = require("./mongoServices/user");
+const express           = require("express");
+const app               = express();
+const bodyParser        = require('body-parser');
 
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      
-    // intercept OPTIONS method
-    if ('OPTIONS' == req.method) {
-      res.sendStatus(200);
-    }
-    else {
-      next();
-    }
-};
-app.use(allowCrossDomain);
+const helpers           = require('./genericServices/helpers')
+const jwt               = require('./genericServices/jwt')
+const loginHandler      = require('./handlers/loginHandler')
+const userHandler       = require('./handlers/userHandler')
+const customerHandler   = require('./handlers/customerHandler')
 
 app.listen(9999,()=>{
     console.log(`Time : ${Date.now()}listening on port 9999 \n.............`)
 });
 
-app.get("/api/customer",(req,res)=>{
-    customer.findAll((err,docs)=>{
-        if (err) {
-            res.end(`Error : ${err}`)
-        } else {
-            res.json(docs)
-        }
-    })
-})
+app.use(helpers.allowCrossDomain);
 
-app.get('/api/customer/:id',(req,res)=>{
-    const id = req.params.id;
-    customer.findOne(id,(err,docs)=>{
-        if (err) {
-            res.end(`Error : ${err}`)
-        } else {
-            res.json(docs)
-        }
-    })
-})
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
-app.post("/api/customer",(req,res)=>{
-    let rawDocObject = '';
-    req.on("data",(chunk)=>{
-        rawDocObject += chunk;
-    })
-    req.on("end",()=>{
-        docObject = JSON.parse(rawDocObject);
-        customer.insertOne(docObject,(err,response)=>{
-            if (err) {
-                res.send(err)
-            } else {
-                res.send(response)
-            }
-        })
-    })
-})
+app.post("/api/user", userHandler.insertOne)
 
-app.put('/api/customer',(req,res)=>{
-    let rawDocObject = '';
-    req.on("data",(chunk)=>{
-        rawDocObject += chunk;
-    })
-    req.on("end",()=>{
-        docObject = JSON.parse(rawDocObject);
-        customer.updateOne(docObject,(err,response)=>{
-            if (err) {
-                res.end(`Error : ${err}`)
-            } else {
-                res.send(response)
-            }
-        })
-    })
-})
+app.post('/login', loginHandler.verifyUser, jwt.generateToken);
 
-app.delete('/api/customer/:id', (req,res)=>{
-    const id = req.params.id;
-    customer.deleteOne(id,(err,response)=>{
-        if (err) {
-            res.end(`Error : ${err}`)
-        } else {
-            res.send(response)
-        }
-    })
-})
+app.use('/api/*', jwt.verifyToken)
 
-app.get('/api/user/:username',(req,res)=>{
-    const username = req.params.username;
-    user.findOne(username,(err,docs)=>{
-        if (err) {
-            res.end(`Error : ${err}`)
-        } else {
-            res.json(docs)
-        }
-    })
-})
+app.get("/api/customer", customerHandler.findAll)
 
-app.get('/api/verifyuser',(req,res)=>{
-    //TODO : Change the authorization logic
-    console.log('Verified the user successfully')
-    res.json({"status": 1 })
-})
+app.get('/api/customer/:id', customerHandler.findOne)
 
-app.post("/api/user",(req,res)=>{
-    let rawDocObject = '';
-    req.on("data",(chunk)=>{
-        rawDocObject += chunk;
-    })
-    req.on("end",()=>{
-        docObject = JSON.parse(rawDocObject);
-        user.insertOne(docObject,(err,response)=>{
-            if (err) {
-                res.send(err)
-            } else {
-                res.send(response)
-            }
-        })
-    })
-})
+app.post("/api/customer", customerHandler.insertOne)
 
-app.get('*',(req,res)=>{
-    res.end("Invalid Url")
+app.put('/api/customer', customerHandler.updateOne)
+
+app.delete('/api/customer/:id', customerHandler.deleteOne)
+
+app.get('/api/user/:username', userHandler.findOne)
+
+app.get('*',(req,res)=>{                /*    <------ This needs to be at the end */
+    res.end("Invalid Url")              /*    because the first match will trigger the corresponding handler */
 })

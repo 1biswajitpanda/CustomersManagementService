@@ -22,6 +22,8 @@
 //TODO : How to get the last key value from the index in mongodb
 //TODO : Password must be encrypted while stored at node
 //TODO : Change the authorization logic in node
+//TODO : Set the status code for each response
+//TODO : How to read the header from the http subscribe
 
 import { Component, OnInit } from '@angular/core';
 import { Customer } from "../customer";

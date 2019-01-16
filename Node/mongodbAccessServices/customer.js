@@ -13,6 +13,9 @@
 //          >db.createCollection('customer')
 //          >db.customer.createIndex({customerId:-1},{unique:true})
 
+
+//TODO : change the corresponding methods to findeOne, findOneAndUpdate and findOneAndDelete
+
 const MongoClient = require('mongodb').MongoClient;
 
 // Connection URL

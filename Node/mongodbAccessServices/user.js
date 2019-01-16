@@ -12,7 +12,8 @@
 //          >db.user.createIndex({username:1},{unique:true})
 
 
-const MongoClient = require('mongodb').MongoClient;
+const MongoClient   = require('mongodb').MongoClient;
+const helpers       = require("../genericServices/helpers")
 
 // Connection URL
 const url = 'mongodb://localhost:27017';
@@ -28,13 +29,13 @@ user.findOne = (username,callback)=>{
             callback (err,null)
         } else {
             const db = client.db('user');
-            db.collection('user').find({'username': username}).toArray((err,docs)=>{
-                if (err) {
+            db.collection('user').findOne({'username': username},(err,doc)=>{
+                if (err || (doc == null )) {
                     client.close();
-                    callback(err,null)
+                    callback("User Is Not Present",null)
                 } else {
-                    callback(false,docs)
                     client.close();
+                    callback(false,doc)
                 }
             })
         }
@@ -64,6 +65,9 @@ user.insertOne = (docObject, callback) => {
             callback (err,null)
         } else {
             const db = client.db('user');
+            //Encrypt the password before storing
+            let hash = helpers.hash(docObject.password);
+            docObject.password = hash;
             // Insert a single document
             db.collection('user').insertOne(docObject, function(err, response) {
                 if (err) {
@@ -77,5 +81,22 @@ user.insertOne = (docObject, callback) => {
         }
     })
 };
+
+//Verify User
+user.verify = (docObject, callback) => {
+    user.findOne(docObject.username,(err,doc)=>{
+        if(err) {
+            callback(err,null)
+        } else {
+            let hash = helpers.hash(docObject.password);
+            if (hash == doc.password) {
+                delete doc.password
+                callback(false,doc)
+            } else {
+                callback('Invalid Username/Password',null)
+            }
+        }
+    })
+}
 
 module.exports = user;

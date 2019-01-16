@@ -36,7 +36,6 @@ export class CustomersDataService {
 
     private handleError<T> (Error, result?: T) {
         return (error: any) : Observable<T> =>{
-            console.log(Error + error)
             return of (result as T)
         }
     }

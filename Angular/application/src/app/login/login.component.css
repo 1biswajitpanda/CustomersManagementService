@@ -1,15 +1,15 @@
 .container {
-  display: flex;
-  justify-content: center;
-}
+    display: flex;
+    justify-content: center;
+  }
 
-.modal-content {
-  width: 400px;
-}
+  .modal-content {
+    width: 400px;
+  }
 
-.modal-header, h4, .close {
-  background-color: #428bca;
-  color:white !important;
-  text-align: center;
-  font-size: 30px;
-}
+  .modal-header, h4, .close {
+    background-color: #428bca;
+    color:white !important;
+    text-align: center;
+    font-size: 30px;
+  }

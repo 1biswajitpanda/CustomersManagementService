@@ -18,7 +18,7 @@ export class UserDataService {
     }
 
     //TODO : Change the logic
-    verifyUser() : Observable<any> {
-        return this.http.get('http://localhost:9999/api/verifyuser',this.httpOptions)
+    verifyUser(user:User) : Observable<any> {
+        return this.http.post('http://localhost:9999/login',user,this.httpOptions)
     }
 }

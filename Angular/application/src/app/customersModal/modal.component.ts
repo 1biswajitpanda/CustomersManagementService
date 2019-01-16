@@ -3,18 +3,18 @@ import { Customer } from "../customer";
 import { CustomersDataService } from '../services/customers-data.service';
 
 @Component({
-  selector: 'app-modal',
-  templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.css']
+  selector      : 'app-modal',
+  templateUrl   : './modal.component.html',
+  styleUrls     : ['./modal.component.css']
 })
 export class ModalComponent implements OnInit {
 
     constructor(private customerDataService: CustomersDataService) { }
 
-    @Input() customer : Customer;
-    @Input() isEdit : boolean;
-    @Input() isDelete : boolean;
-    @Input() isAdd : boolean;
+    @Input() customer   : Customer;
+    @Input() isEdit     : boolean;
+    @Input() isDelete   : boolean;
+    @Input() isAdd      : boolean;
     @Output() modalActionClose = new EventEmitter<boolean>()
 
     operation : string;
